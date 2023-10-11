@@ -5,41 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MediaPlayer"
         mc:Ignorable="d"
-        Title="Media Player" Height="300" Width="300" ResizeMode="NoResize">
+        Title="Media Player" Height="380" Width="380" ResizeMode="NoResize">
 
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed" />
+        <CommandBinding Command="ApplicationCommands.Properties" CanExecute="EditProperties_CanExecute" Executed="EditProperties_Executed" />
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed" />
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
         <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
     </Window.CommandBindings>
-    
-    <Grid>
+
+    <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        
 
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Open" />
+                    <MenuItem Header="_Open" Command="ApplicationCommands.Open" />
                     <MenuItem Header="_Edit Tags" />
                     <Separator />
                     <MenuItem Header="_Exit" />
                 </MenuItem>
                 <MenuItem Header="_Media">
-                    <MenuItem Header="_Play" />
-                    <MenuItem Header="_Pause" />
-                    <MenuItem Header="_Stop" />
+                    <MenuItem Header="_Play" Command="MediaCommands.Play" />
+                    <MenuItem Header="_Pause" Command="MediaCommands.Pause" />
+                    <MenuItem Header="_Stop" Command="MediaCommands.Stop" />
                 </MenuItem>
             </Menu>
         </DockPanel>
 
-        <MediaElement Name="mePlayer" Grid.Row="1" LoadedBehavior="Manual" Stretch="None" />
+        <MediaElement Name="mediaPlayer" Grid.Row="0" LoadedBehavior="Manual" Stretch="None" />
+
+        <Image Name="albumArt" Grid.Row="1" HorizontalAlignment="Center" Margin="10" />
+        <TextBlock x:Name="mediaName" TextWrapping="Wrap" TextAlignment="Center" Background="Black" Foreground="WhiteSmoke" Grid.Row="2" Height="30" Padding="10" FontSize="14"/>
+        <TextBlock x:Name="mediaAlbum" TextWrapping="Wrap" TextAlignment="Center" Background="Black" Foreground="WhiteSmoke" Grid.Row="3" Padding="2" FontSize="12"/>
+        <TextBlock x:Name="mediaArtist" TextWrapping="Wrap" TextAlignment="Center" Background="Black" Foreground="WhiteSmoke" Grid.Row="4" Padding="2" FontSize="12"/>
         
-        <StatusBar Grid.Row="2">
+        <StatusBar Grid.Row="5" Margin="0, 10, 0, 0">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>
