@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Resources;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using TagLib;
 
 namespace MediaPlayer
@@ -33,6 +34,22 @@ namespace MediaPlayer
         public MainWindow()
         {
             InitializeComponent();
+
+            //slider/timer code found: https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += timer_Tick;
+            timer.Start();
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if ((mediaPlayer.Source != null) && (mediaPlayer.NaturalDuration.HasTimeSpan) && (!userIsDragging))
+            {
+                slider.Minimum = 0;
+                slider.Maximum = mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
+                slider.Value = mediaPlayer.Position.TotalSeconds;
+            }
         }
 
         private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -55,22 +72,57 @@ namespace MediaPlayer
                 //create a taglib file object for accessing mp3 metadata
                 currentFile = TagLib.File.Create(fileDialog.FileName);
 
-                //update the media information display
+                //update the media and tag editor displays
                 initMediaDisplay(currentFile);
+                initTagEditor(currentFile);
 
                 //store the full path of the selected media for saving later
                 currentFilePath = fileDialog.FileName;
             }
         }
 
-        private void EditProperties_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
         }
 
+        private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            currentFile.Tag.Title = tagTitle.Text;
+            currentFile.Tag.AlbumArtists[0] = tagArtist.Text;
+            currentFile.Tag.Album = tagAlbum.Text;
+            currentFile.Tag.Year = Convert.ToUInt32(tagYear.Text, 16);
+
+            if (isPlaying) {
+                mediaPlayer.Stop();
+
+            }
+
+            try
+            {
+                currentFile.Save();
+            } 
+            catch 
+            {
+                throw;
+            }
+           
+
+
+            initMediaDisplay(currentFile);
+
+            editTags.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private void EditProperties_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = currentFilePath != null;
+        }
+
         private void EditProperties_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            initTagEditor(currentFile);
+            editTags.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -135,9 +187,19 @@ namespace MediaPlayer
             {
                 var image = file.Tag.Pictures[0];
                 albumArt.Source = getAlbumArtAsBitmap(image);
+                albumArt.Visibility = Visibility.Visible;
             }
-
             
+        }
+
+        private void initTagEditor(TagLib.File file)
+        {
+            //update tag information on startup
+
+            tagTitle.Text = file.Tag.Title;
+            tagArtist.Text = file.Tag.FirstAlbumArtist;
+            tagAlbum.Text = file.Tag.Album;
+            tagYear.Text = file.Tag.Year.ToString();
         }
 
         private BitmapImage getAlbumArtAsBitmap (IPicture image)
@@ -147,8 +209,6 @@ namespace MediaPlayer
 
             var imageBytes = image.Data.Data;
 
-            Uri BitmapUri;
-            StreamResourceInfo BitmapStreamSourceInfo;
             try
             {
                 BitmapImage bi = new BitmapImage();
@@ -159,7 +219,7 @@ namespace MediaPlayer
 
                 return bi;
             }
-            catch { throw; }
+            catch { throw; } //TODO needs more catches
         }
     }
 }

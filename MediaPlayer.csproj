@@ -8,11 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="media\media-play.png" />
+    <None Remove="media\pause-icon.png" />
+    <None Remove="media\stop-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="packages\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="media\media-play.png" />
+    <Resource Include="media\pause-icon.png" />
+    <Resource Include="media\stop-icon.png" />
   </ItemGroup>
 
 </Project>
