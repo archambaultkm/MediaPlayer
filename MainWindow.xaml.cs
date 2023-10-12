@@ -35,7 +35,7 @@ namespace MediaPlayer
         {
             InitializeComponent();
 
-            //slider/timer code found: https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
+            //slider/timer example found: https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += timer_Tick;
@@ -66,8 +66,11 @@ namespace MediaPlayer
             //TODO wrap with try/catch
             if (fileDialog.ShowDialog() == true)
             {
-                //set the media element source to the selected song
-                mediaPlayer.Source = new Uri(fileDialog.FileName);
+                //store the full path of the selected media for saving later
+                currentFilePath = fileDialog.FileName;
+
+                //initialize media element
+                initMediaPlayer();
 
                 //create a taglib file object for accessing mp3 metadata
                 currentFile = TagLib.File.Create(fileDialog.FileName);
@@ -76,9 +79,13 @@ namespace MediaPlayer
                 initMediaDisplay(currentFile);
                 initTagEditor(currentFile);
 
-                //store the full path of the selected media for saving later
-                currentFilePath = fileDialog.FileName;
             }
+        }
+
+        private void initMediaPlayer()
+        {
+            //set the media element source to the selected song
+            mediaPlayer.Source = new Uri(currentFilePath);
         }
 
         private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -89,28 +96,23 @@ namespace MediaPlayer
         private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             currentFile.Tag.Title = tagTitle.Text;
-            currentFile.Tag.AlbumArtists[0] = tagArtist.Text;
+            currentFile.Tag.Performers[0] = tagArtist.Text;
             currentFile.Tag.Album = tagAlbum.Text;
-            currentFile.Tag.Year = Convert.ToUInt32(tagYear.Text, 16);
-
-            if (isPlaying) {
-                mediaPlayer.Stop();
-
-            }
-
+            currentFile.Tag.Year = Convert.ToUInt16(tagYear.Text);
+          
             try
             {
+                mediaPlayer.Stop();
+                mediaPlayer.Source = null;
                 currentFile.Save();
-            } 
-            catch 
+                initMediaPlayer();
+            }
+            catch
             {
                 throw;
             }
-           
-
 
             initMediaDisplay(currentFile);
-
             editTags.Visibility = System.Windows.Visibility.Hidden;
         }
 
@@ -129,6 +131,7 @@ namespace MediaPlayer
         {
             e.CanExecute = (mediaPlayer != null) && (mediaPlayer.Source != null);
         }
+
         private void Play_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             mediaPlayer.Play();
