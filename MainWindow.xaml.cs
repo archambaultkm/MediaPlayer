@@ -27,6 +27,7 @@ namespace MediaPlayer
     public partial class MainWindow : Window
     {
         TagLib.File currentFile;
+        TagEditControl editor;
         private string currentFilePath;
         private bool userIsDragging;
         private bool isPlaying;
@@ -35,11 +36,18 @@ namespace MediaPlayer
         {
             InitializeComponent();
 
+
             //slider/timer example found: https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += timer_Tick;
             timer.Start();
+        }
+
+        private void FileUpdated(object sender, RoutedEventArgs e)
+        {
+            initMediaPlayer();
+            initMediaDisplay(currentFile);
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -77,7 +85,7 @@ namespace MediaPlayer
 
                 //update the media and tag editor displays
                 initMediaDisplay(currentFile);
-                initTagEditor(currentFile);
+                //editor.initTagEditor(currentFile);
 
             }
         }
@@ -88,33 +96,7 @@ namespace MediaPlayer
             mediaPlayer.Source = new Uri(currentFilePath);
         }
 
-        private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            currentFile.Tag.Title = tagTitle.Text;
-            currentFile.Tag.Performers[0] = tagArtist.Text;
-            currentFile.Tag.Album = tagAlbum.Text;
-            currentFile.Tag.Year = Convert.ToUInt16(tagYear.Text);
-          
-            try
-            {
-                mediaPlayer.Stop();
-                mediaPlayer.Source = null;
-                currentFile.Save();
-                initMediaPlayer();
-            }
-            catch
-            {
-                throw;
-            }
-
-            initMediaDisplay(currentFile);
-            editTags.Visibility = System.Windows.Visibility.Hidden;
-        }
+        
 
         private void EditProperties_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -123,8 +105,13 @@ namespace MediaPlayer
 
         private void EditProperties_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            initTagEditor(currentFile);
-            editTags.Visibility = System.Windows.Visibility.Visible;
+            mediaPlayer.Stop();
+            mediaPlayer.Source = null;
+
+            EditorControl.currentFile = currentFile;
+            EditorControl.initTagEditor();
+            EditorControl.Visibility = System.Windows.Visibility.Visible;
+
         }
 
         private void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -177,13 +164,13 @@ namespace MediaPlayer
             lblProgress.Text = TimeSpan.FromSeconds(slider.Value).ToString(@"hh\:mm\:ss"); 
         }
 
-        private void initMediaDisplay(TagLib.File file)
+        public void initMediaDisplay(TagLib.File file)
         {
             //update the displayed media information
 
             mediaName.Text = file.Tag.Title;
-            mediaArtist.Text = file.Tag.FirstAlbumArtist;
-            mediaAlbum.Text = file.Tag.Album;
+            mediaArtist.Text = file.Tag.Performers[0];
+            mediaAlbum.Text = file.Tag.Album + ", " + file.Tag.Year;
 
             //set image art if the mp3 file has album art attached
             if (file.Tag.Pictures.Length > 0)
@@ -192,18 +179,9 @@ namespace MediaPlayer
                 albumArt.Source = getAlbumArtAsBitmap(image);
                 albumArt.Visibility = Visibility.Visible;
             }
-            
         }
 
-        private void initTagEditor(TagLib.File file)
-        {
-            //update tag information on startup
-
-            tagTitle.Text = file.Tag.Title;
-            tagArtist.Text = file.Tag.FirstAlbumArtist;
-            tagAlbum.Text = file.Tag.Album;
-            tagYear.Text = file.Tag.Year.ToString();
-        }
+       
 
         private BitmapImage getAlbumArtAsBitmap (IPicture image)
         {

@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="MediaPlayer.TagEditControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MediaPlayer"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="350">
+
+    <UserControl.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Save" CanExecute="Save_CanExecute" Executed="Save_Executed" />
+    </UserControl.CommandBindings>
+    
+    <Grid VerticalAlignment="Center" Height="auto" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Content="Title:" Grid.Row="0" Grid.Column="0" />
+        <TextBox x:Name="tagTitle" MaxLength="50" Grid.Row="0" Grid.Column="1"/>
+        <Label Content="Artist:" Grid.Row="1" Grid.Column="0"/>
+        <TextBox x:Name="tagArtist" MaxLength="50" Grid.Row="1" Grid.Column="1" Margin="0,10,0,0"/>
+        <Label Content="Album:" Grid.Row="2" Grid.Column="0"/>
+        <TextBox x:Name="tagAlbum" MaxLength="50" Grid.Row="2" Grid.Column="1" Margin="0,10,0,0"/>
+        <Label Content="Year:" Grid.Row="3" Grid.Column="0"/>
+        <TextBox x:Name="tagYear" MaxLength="50" Grid.Row="3" Grid.Column="1" Margin="0,10,0,0"/>
+
+        <Button Name="btnSave" Grid.Row="4" Grid.ColumnSpan="2" Width="250" Margin="0,20,0,20" Command="ApplicationCommands.Save" Button.Click="save_Click">Save</Button>
+    </Grid>
+</UserControl>

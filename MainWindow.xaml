@@ -9,7 +9,6 @@
 
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed" />
-        <CommandBinding Command="ApplicationCommands.Save" CanExecute="Save_CanExecute" Executed="Save_Executed" />
         <CommandBinding Command="ApplicationCommands.Properties" CanExecute="EditProperties_CanExecute" Executed="EditProperties_Executed" />
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed" />
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
@@ -29,8 +28,6 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open" Command="ApplicationCommands.Open" />
                     <MenuItem Header="_Edit Tags" Command="ApplicationCommands.Properties" />
-                    <Separator />
-                    <MenuItem Header="_Exit" />
                 </MenuItem>
                 <MenuItem Header="_Media">
                     <MenuItem Header="_Play" Command="MediaCommands.Play" />
@@ -42,7 +39,11 @@
 
         <MediaElement Name="mediaPlayer" Grid.Row="0" LoadedBehavior="Manual" Stretch="None" />
 
-        <Image Name="albumArt" Height="300" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Center" Visibility="Hidden"/>
+        <Image Name="albumArt" 
+               Height="200" 
+               Grid.Row="1"
+               HorizontalAlignment="Center"
+               Visibility="Hidden"/>
 
         <StackPanel 
             Name="mediaDisplay" 
@@ -81,23 +82,7 @@
         
         </StackPanel>
 
-        <StackPanel
-            Name="editTags" 
-            Background="White" 
-            Opacity="0.5" 
-            Orientation = "Vertical" 
-            Grid.Row="1" 
-            Grid.RowSpan="2"
-            Visibility="Hidden">
-
-            <TextBox x:Name="tagTitle"></TextBox>
-            <TextBox x:Name="tagArtist"></TextBox>
-            <TextBox x:Name="tagAlbum"></TextBox>
-            <TextBox x:Name="tagYear"></TextBox>
-
-            <Button Name="btnSave" Command="ApplicationCommands.Save"> Save </Button>
-            
-        </StackPanel>
+        <local:TagEditControl x:Name="EditorControl" Grid.Row="1" Grid.RowSpan="2" ClickSave="FileUpdated" Visibility="Hidden" />
 
         <StatusBar Grid.Row="3">
             <StatusBar.ItemsPanel>
@@ -146,7 +131,10 @@
                 <TextBlock Name="lblProgress">00:00:00</TextBlock>
             </StatusBarItem>
             <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Stretch">
-                <Slider Name="slider" Thumb.DragStarted="Slider_DragStarted"  Thumb.DragCompleted="Slider_DragCompleted" ValueChanged="Slider_ValueChanged" />
+                <Slider Name="slider" 
+                        Thumb.DragStarted="Slider_DragStarted"  
+                        Thumb.DragCompleted="Slider_DragCompleted" 
+                        ValueChanged="Slider_ValueChanged" />
             </StatusBarItem>
         </StatusBar>
     </Grid>
