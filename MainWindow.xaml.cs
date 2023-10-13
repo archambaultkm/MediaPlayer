@@ -27,7 +27,6 @@ namespace MediaPlayer
     public partial class MainWindow : Window
     {
         TagLib.File currentFile;
-        TagEditControl editor;
         private string currentFilePath;
         private bool userIsDragging;
         private bool isPlaying;
@@ -46,6 +45,10 @@ namespace MediaPlayer
 
         private void FileUpdated(object sender, RoutedEventArgs e)
         {
+            currentFile.Dispose();
+            mediaPlayer.Source = null;
+            currentFile = EditorControl.currentFile;
+            currentFile.Save();
             initMediaPlayer();
             initMediaDisplay(currentFile);
         }
@@ -109,7 +112,7 @@ namespace MediaPlayer
             mediaPlayer.Source = null;
 
             EditorControl.currentFile = currentFile;
-            currentFile.Dispose();
+            //currentFile.Dispose();
 
             EditorControl.initTagEditor();
             EditorControl.Visibility = System.Windows.Visibility.Visible;

@@ -50,7 +50,7 @@ namespace MediaPlayer
             try
             {
                 currentFile.Dispose();
-                currentFile.Save();
+                //currentFile.Save();
                 this.Visibility = System.Windows.Visibility.Hidden;
                 
             }
