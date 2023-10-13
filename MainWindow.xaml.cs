@@ -109,6 +109,8 @@ namespace MediaPlayer
             mediaPlayer.Source = null;
 
             EditorControl.currentFile = currentFile;
+            currentFile.Dispose();
+
             EditorControl.initTagEditor();
             EditorControl.Visibility = System.Windows.Visibility.Visible;
 
